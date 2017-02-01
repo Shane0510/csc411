@@ -12,6 +12,8 @@ import os
 from scipy.ndimage import filters
 import urllib
 from PIL import Image
+import shutil
+from shutil import copy
 
 act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
 
@@ -60,66 +62,66 @@ testfile = urllib.URLopener()
 #Note: you need to create the uncropped folder first in order
 #for this to work
 
-#def part1():
-for a in act:
-    name = a.split()[1].lower()
-    i = 0
-    for line in open("facescrub_actors.txt"):
-        if a in line:
-            filename = name+str(i)+'.'+line.split()[4].split('.')[-1]
-            #A version without timeout (uncomment in case you need to
-            #unsupress exceptions, which timeout() does)
-            #testfile.retrieve(line.split()[4], "uncropped/"+filename)
-            #timeout is used to stop downloading images which take too long to download
-            timeout(testfile.retrieve, (line.split()[4], "uncropped/"+filename), {}, 30)
-            if not os.path.isfile("uncropped/"+filename):
-                continue
-            else:
-                try:
-                    x1, y1, x2, y2 = line.split()[5].split(",");
-                    im = imread("uncropped/" + filename);
-                    face = im[int(y1):int(y2), int(x1):int(x2)]
-                    image = imresize(face, [32, 32])
-                    imsave("cropped/" + filename, rgb2gray(image), cmap = cm.gray)
-                except:
+def part1():
+    for a in act:
+        name = a.split()[1].lower()
+        i = 0
+        for line in open("facescrub_actors.txt"):
+            if a in line:
+                filename = name+str(i)+'.'+line.split()[4].split('.')[-1]
+                #A version without timeout (uncomment in case you need to
+                #unsupress exceptions, which timeout() does)
+                #testfile.retrieve(line.split()[4], "uncropped/"+filename)
+                #timeout is used to stop downloading images which take too long to download
+                timeout(testfile.retrieve, (line.split()[4], "uncropped/"+filename), {}, 30)
+                if not os.path.isfile("uncropped/"+filename):
                     continue
-            print filename
-            i += 1
+                else:
+                    try:
+                        x1, y1, x2, y2 = line.split()[5].split(",");
+                        im = imread("uncropped/" + filename);
+                        face = im[int(y1):int(y2), int(x1):int(x2)]
+                        image = imresize(face, [32, 32])
+                        imsave("cropped/" + filename, rgb2gray(image), cmap = cm.gray)
+                    except:
+                        continue
+                print filename
+                i += 1
     
 #def part2():
-# trainning_set = 100
-# test_set = 10
-# validation_set = 10
-# 
-# folder = os.listdir("cropped/")
-# 
-# for image in filename:
-#     f_name = image.split(".")[0]
-#     n_list = [v for v in f_name if v.isalpha()]
-#     name = f_name[0:len(n_list)]
-#     
-#     if not os.path.exists(name + "/"):
-#         os.mkdir(name + "/")
-#         os.mkdir(name + "/trainning_set/")
-#         os.mkdir(name + "/test_set/")
-#         os.mkdir(name + "/validation_set/")
-#     
-#     try:
-#         val = int(f_name.split(name)[1])
-#     
-#     except:
-#         continue
-#     
-#     if val < trainning_set:
-#         shutil.copy("cropped/" + image, name + "/trainning_set/" + image)
-#         
-#     elif trainning_set <= val < trainning_set + test_set:
-#         shutil.copy("cropped/" + image, name + "/test_set/" + image)
-#     
-#     elif trainning_set + test_set_num <= val < trainning_set + test_set +\
-#     validation_set:
-#         shutil.copy("cropped/" + image, name + "/validation_set/" + image)
-#             
+trainning_set = 100
+test_set = 10
+validation_set = 10
+
+folder = os.listdir("cropped/")
+
+for image in folder:
+    f_name = image.split(".")[0]
+    n_list = [v for v in f_name if v.isalpha()]
+    name = f_name[0:len(n_list)]
+    
+    if not os.path.exists(name + "/"):
+        os.mkdir(name + "/")
+        os.mkdir(name + "/trainning_set/")
+        os.mkdir(name + "/test_set/")
+        os.mkdir(name + "/validation_set/")
+    
+    try:
+        val = int(f_name.split(name)[1])
+    
+    except:
+        continue
+    
+    if val < trainning_set:
+        copy("cropped/" + image, name + "/trainning_set/" + image)
+        
+    elif trainning_set <= val < trainning_set + test_set:
+        copy("cropped/" + image, name + "/test_set/" + image)
+    
+    elif trainning_set + test_set <= val < trainning_set + test_set +\
+    validation_set:
+        copy("cropped/" + image, name + "/validation_set/" + image)
+            
   
   
 #def part3()
