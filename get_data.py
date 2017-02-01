@@ -13,7 +13,7 @@ from scipy.ndimage import filters
 import urllib
 from PIL import Image
 
-act = list(set([a.split("\t")[0] for a in open("facescrub_actresses.txt").readlines()]))
+act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
 
 #def crop(image_array):
 #    imresize(image_array)
@@ -64,7 +64,7 @@ testfile = urllib.URLopener()
 for a in act:
     name = a.split()[1].lower()
     i = 0
-    for line in open("facescrub_actresses.txt"):
+    for line in open("facescrub_actors.txt"):
         if a in line:
             filename = name+str(i)+'.'+line.split()[4].split('.')[-1]
             #A version without timeout (uncomment in case you need to
@@ -87,36 +87,65 @@ for a in act:
             i += 1
     
 #def part2():
-trainning_set = 100
-test_set = 10
-validation_set = 10
+# trainning_set = 100
+# test_set = 10
+# validation_set = 10
+# 
+# folder = os.listdir("cropped/")
+# 
+# for image in filename:
+#     f_name = image.split(".")[0]
+#     n_list = [v for v in f_name if v.isalpha()]
+#     name = f_name[0:len(n_list)]
+#     
+#     if not os.path.exists(name + "/"):
+#         os.mkdir(name + "/")
+#         os.mkdir(name + "/trainning_set/")
+#         os.mkdir(name + "/test_set/")
+#         os.mkdir(name + "/validation_set/")
+#     
+#     try:
+#         val = int(f_name.split(name)[1])
+#     
+#     except:
+#         continue
+#     
+#     if val < trainning_set:
+#         shutil.copy("cropped/" + image, name + "/trainning_set/" + image)
+#         
+#     elif trainning_set <= val < trainning_set + test_set:
+#         shutil.copy("cropped/" + image, name + "/test_set/" + image)
+#     
+#     elif trainning_set + test_set_num <= val < trainning_set + test_set +\
+#     validation_set:
+#         shutil.copy("cropped/" + image, name + "/validation_set/" + image)
+#             
+  
+  
+#def part3()
+def f(x, y, theta):
+    x = vstack( (ones((1, x.shape[1])), x))
+    return sum( (y - dot(theta.T,x)) ** 2)
 
-folder = os.listdir("cropped/")
-
-for image in filename:
-    f_name = image.split(".")[0]
-    n_list = [v for v in f_name if v.isalpha()]
-    name = f_name[0:len(n_list)]
+def df(x, y, theta):
+    x = vstack( (ones((1, x.shape[1])), x))
+    return -2*sum((y-dot(theta.T, x))*x, 1)
     
-    if not os.path.exists(name + "/"):
-        os.mkdir(name + "/")
-    
-    try:
-        val = int(f_name.split(name)[1])
-    
-    except:
-        continue
-    
-    if val < trainning_set:
-        if not os.path.exists(n + "/trainning_set/"):
-            os.mkdir(name + "/trainning_set/")
-        shutil.copy("cropped/" + image, name + "/trainning_set/" + image)
-        
-    elif trainning_set <= val < trainning_set + test_set:
-        if not os.path.exists(name + "/test_set"):
-            os.mkdir(name + "/test_set/")
-        
-            
+def grad_descent(f, df, x, y, init_t, alpha):
+    EPS = 1e-5   #EPS = 10**(-5)
+    prev_t = init_t-10*EPS
+    t = init_t.copy()
+    max_iter = 30000
+    iter  = 0
+    while norm(t - prev_t) >  EPS and iter < max_iter:
+        prev_t = t.copy()
+        t -= alpha*df(x, y, t)
+        if iter % 500 == 0:
+            print "Iter", iter
+            print "x = (%.2f, %.2f, %.2f), f(x) = %.2f" % (t[0], t[1], t[2], f(x, y, t)) 
+            print "Gradient: ", df(x, y, t), "\n"
+        iter += 1
+    return t
 
 
 
