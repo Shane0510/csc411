@@ -88,40 +88,40 @@ def part1():
                 print filename
                 i += 1
     
-#def part2():
-trainning_set = 100
-test_set = 10
-validation_set = 10
-
-folder = os.listdir("cropped/")
-
-for image in folder:
-    f_name = image.split(".")[0]
-    n_list = [v for v in f_name if v.isalpha()]
-    name = f_name[0:len(n_list)]
+def part2():
+    trainning_set = 100
+    test_set = 10
+    validation_set = 10
     
-    if not os.path.exists(name + "/"):
-        os.mkdir(name + "/")
-        os.mkdir(name + "/trainning_set/")
-        os.mkdir(name + "/test_set/")
-        os.mkdir(name + "/validation_set/")
+    folder = os.listdir("cropped/")
     
-    try:
-        val = int(f_name.split(name)[1])
-    
-    except:
-        continue
-    
-    if val < trainning_set:
-        copy("cropped/" + image, name + "/trainning_set/" + image)
+    for image in folder:
+        f_name = image.split(".")[0]
+        n_list = [v for v in f_name if v.isalpha()]
+        name = f_name[0:len(n_list)]
         
-    elif trainning_set <= val < trainning_set + test_set:
-        copy("cropped/" + image, name + "/test_set/" + image)
-    
-    elif trainning_set + test_set <= val < trainning_set + test_set +\
-    validation_set:
-        copy("cropped/" + image, name + "/validation_set/" + image)
+        if not os.path.exists(name + "/"):
+            os.mkdir(name + "/")
+            os.mkdir(name + "/trainning_set/")
+            os.mkdir(name + "/test_set/")
+            os.mkdir(name + "/validation_set/")
+        
+        try:
+            val = int(f_name.split(name)[1])
+        
+        except:
+            continue
+        
+        if val < trainning_set:
+            copy("cropped/" + image, name + "/trainning_set/" + image)
             
+        elif trainning_set <= val < trainning_set + test_set:
+            copy("cropped/" + image, name + "/test_set/" + image)
+        
+        elif trainning_set + test_set <= val < trainning_set + test_set +\
+        validation_set:
+            copy("cropped/" + image, name + "/validation_set/" + image)
+                
   
   
 #def part3()
