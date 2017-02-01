@@ -13,7 +13,7 @@ from scipy.ndimage import filters
 import urllib
 from PIL import Image
 
-act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
+act = list(set([a.split("\t")[0] for a in open("facescrub_actresses.txt").readlines()]))
 
 #def crop(image_array):
 #    imresize(image_array)
@@ -64,7 +64,7 @@ testfile = urllib.URLopener()
 for a in act:
     name = a.split()[1].lower()
     i = 0
-    for line in open("facescrub_actors.txt"):
+    for line in open("facescrub_actresses.txt"):
         if a in line:
             filename = name+str(i)+'.'+line.split()[4].split('.')[-1]
             #A version without timeout (uncomment in case you need to
