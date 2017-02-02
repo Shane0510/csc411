@@ -7,6 +7,7 @@ import random
 import time
 from scipy.misc import imread
 from scipy.misc import imresize
+# from scipy.misc import imsave
 import matplotlib.image as mpimg
 import os
 from scipy.ndimage import filters
@@ -145,52 +146,97 @@ def grad_descent(f, df, x, y, init_t, alpha):
         iter += 1
     return t
 
-def part3():
-    t = np.zeros([1025, 1])
-    
+def classifier(size, t):
     x = np.empty(shape=[0, 1024])
-    y = np.array([[1 for v in range(100)]])
-    y1 = np.array([[0 for p in range(100)]])
+    y = np.array([[1 for v in range(size/2)]])
+    y1 = np.array([[0 for p in range(size/2)]])
     y = np.concatenate((y, y1), 1)
-    y = np.reshape(y, (200,1))
-    one = np.array([[1 for q in range(200)]])
-    one = np.reshape(one, (200,1))
+    y = np.reshape(y, (size,1))
+    one = np.array([[1 for q in range(size)]])
+    one = np.reshape(one, (size,1))
     
     hader = os.listdir("hader/trainning_set/")
     carell = os.listdir("carell/trainning_set/")
     
-    for i in range(200):
-        if (i < 100):
+    for i in range(size):
+        if (i < size/2):
             im = imread("hader/trainning_set/" + hader[i])[:,:,0]
         else :
-            im = imread("carell/trainning_set/" + carell[i-100])[:,:,0]
+            im = imread("carell/trainning_set/" + carell[i-size/2])[:,:,0]
         im = np.reshape(im, (1, 1024))
         x = np.concatenate((x, im), 0)
+    
+
     x = np.concatenate((one, x), 1)
-    
     new_t = grad_descent(f, df, x, y, t, 5*1e-10)
+    return new_t
     
+def correction(size, set):    
+    x = np.empty(shape=[0, 1024])
+    y = np.array([[1 for v in range(size/2)]])
+    y1 = np.array([[0 for p in range(size/2)]])
+    y = np.concatenate((y, y1), 1)
+    y = np.reshape(y, (size,1))
+    one = np.array([[1 for q in range(size)]])
+    one = np.reshape(one, (size,1))
+    
+    hader = os.listdir("hader/" + set)
+    carell = os.listdir("carell/" + set)
+    
+    for i in range(size):
+        if (i < size/2):
+            im = imread("hader/" + set + hader[i])[:,:,0]
+        else :
+            im = imread("carell/"+ set + carell[i-size/2])[:,:,0]
+        im = np.reshape(im, (1, 1024))
+        x = np.concatenate((x, im), 0)
+
+    x = np.concatenate((one, x), 1)
     correction = 0
     expect = np.dot(x, new_t)
-    print expect
     
-    for i in range(200):
-        if i < 100:
+    for i in range(size):
+        if i < size/2:
             if expect[i] >= 0.5:
                 correction += 1
         else: 
             if expect[i] < 0.5:
                 correction += 1
-    print"cost: %.3f\n" %(f(x, expect, new_t))
-    print"Percentage: %.3f\n" % (correction/float(200))
+    print"cost: %.3f\n" %(f(x, y, new_t))
+    print"Percentage: %.3f\n" % (correction/float(size))
+    
+def part3(size):
+    t = np.zeros([1025, 1])
+    global new_t
+    new_t = classifier(size,  t)
+    correction(200, "trainning_set/")
+    correction(10, "validation_set/")
+    
 
 def part4():
-    part3()
-    imshow(x)
-    imshow(new_t)
+    part3(200)
+    image1 = np.reshape(new_t[1:], (32, 32))
+    # imshow(image1)
+    imsave("full.jpg", image1, cmap = cm.coolwarm)
+    part3(4)
+    image2 = np.reshape(new_t[1:], (32, 32))
+    # imshow(image2)
+    imsave("small.jpg", image2, cmap = cm.coolwarm)
     
 part4()
-    
+
+
+def part5():
+    for i in range(size):
+        if (i < size/2):
+            im = imread("hader/trainning_set/" + hader[i])[:,:,0]
+        else :
+            im = imread("carell/trainning_set/" + carell[i-size/2])[:,:,0]
+        im = np.reshape(im, (1, 1024))
+        x = np.concatenate((x, im), 0)
+    x = np.concatenate((one, x), 1)
+    global new_t
+    new_t = grad_descent(f, df, x, y, t, 5*1e-10)
     
     
     
