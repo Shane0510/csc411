@@ -124,41 +124,79 @@ def part2():
                 
   
   
-#def part3()
 def f(x, y, theta):
-    x = vstack( (ones((1, x.shape[1])), x))
-    return sum( (y - dot(theta.T,x)) ** 2)
+    #x = vstack( (ones((1, x.shape[1])), x))
+    return 0.0025*sum( (y - np.dot(x, theta)) ** 2)
 
 def df(x, y, theta):
-    x = vstack( (ones((1, x.shape[1])), x))
-    return -2*sum((y-dot(theta.T, x))*x, 1)
+    #x = vstack( (ones((1, x.shape[1])), x))
+    return -0.005 * np.dot(x.T, (y - np.dot(x, theta)))
     
 def grad_descent(f, df, x, y, init_t, alpha):
-    EPS = 1e-5   #EPS = 10**(-5)
-    prev_t = init_t-10*EPS
     t = init_t.copy()
     max_iter = 30000
     iter  = 0
-    while norm(t - prev_t) >  EPS and iter < max_iter:
-        prev_t = t.copy()
+    while iter < max_iter:
         t -= alpha*df(x, y, t)
-        if iter % 500 == 0:
-            print "Iter", iter
-            print "x = (%.2f, %.2f, %.2f), f(x) = %.2f" % (t[0], t[1], t[2], f(x, y, t)) 
-            print "Gradient: ", df(x, y, t), "\n"
+        # if iter % 500 == 0:
+        #     print "Iter", iter
+        #     print "x = (%.2f, %.2f, %.2f), f(x) = %.2f" % (t[0], t[1], t[2], f(x, y, t)) 
+        #     print "Gradient: ", df(x, y, t), "\n"
         iter += 1
     return t
 
+def part3():
+    t = np.zeros([1025, 1])
+    
+    x = np.empty(shape=[0, 1024])
+    y = np.array([[1 for v in range(100)]])
+    y1 = np.array([[0 for p in range(100)]])
+    y = np.concatenate((y, y1), 1)
+    y = np.reshape(y, (200,1))
+    one = np.array([[1 for q in range(200)]])
+    one = np.reshape(one, (200,1))
+    
+    hader = os.listdir("hader/trainning_set/")
+    carell = os.listdir("carell/trainning_set/")
+    
+    for i in range(200):
+        if (i < 100):
+            im = imread("hader/trainning_set/" + hader[i])[:,:,0]
+        else :
+            im = imread("carell/trainning_set/" + carell[i-100])[:,:,0]
+        im = np.reshape(im, (1, 1024))
+        x = np.concatenate((x, im), 0)
+    x = np.concatenate((one, x), 1)
+    
+    new_t = grad_descent(f, df, x, y, t, 5*1e-10)
+    
+    correction = 0
+    expect = np.dot(x, new_t)
+    print expect
+    
+    for i in range(200):
+        if i < 100:
+            if expect[i] >= 0.5:
+                correction += 1
+        else: 
+            if expect[i] < 0.5:
+                correction += 1
+    print"cost: %.3f\n" %(f(x, expect, new_t))
+    print"Percentage: %.3f\n" % (correction/float(200))
 
-
-
-
-
-
-
-
-
-
-
-
+def part4():
+    part3()
+    imshow(x)
+    imshow(new_t)
+    
+part4()
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
