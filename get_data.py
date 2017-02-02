@@ -146,32 +146,36 @@ def grad_descent(f, df, x, y, init_t, alpha):
         iter += 1
     return t
 
-def classifier(size, t):
-    x = np.empty(shape=[0, 1024])
-    y = np.array([[1 for v in range(size/2)]])
-    y1 = np.array([[0 for p in range(size/2)]])
-    y = np.concatenate((y, y1), 1)
-    y = np.reshape(y, (size,1))
-    one = np.array([[1 for q in range(size)]])
-    one = np.reshape(one, (size,1))
+# def classifier(size, t):
+#     x = np.empty(shape=[0, 1024])
+#     y = np.array([[1 for v in range(size/2)]])
+#     y1 = np.array([[0 for p in range(size/2)]])
+#     y = np.concatenate((y, y1), 1)
+#     y = np.reshape(y, (size,1))
+#     one = np.array([[1 for q in range(size)]])
+#     one = np.reshape(one, (size,1))
+#     
+#     hader = os.listdir("hader/trainning_set/")
+#     carell = os.listdir("carell/trainning_set/")
+#     
+#     for i in range(size):
+#         if (i < size/2):
+#             im = imread("hader/trainning_set/" + hader[i])[:,:,0]
+#         else :
+#             im = imread("carell/trainning_set/" + carell[i-size/2])[:,:,0]
+#         im = np.reshape(im, (1, 1024))
+#         x = np.concatenate((x, im), 0)
+#     
+# 
+#     x = np.concatenate((one, x), 1)
+#     new_t = grad_descent(f, df, x, y, t, 5*1e-10)
+#     return new_t
     
-    hader = os.listdir("hader/trainning_set/")
-    carell = os.listdir("carell/trainning_set/")
-    
-    for i in range(size):
-        if (i < size/2):
-            im = imread("hader/trainning_set/" + hader[i])[:,:,0]
-        else :
-            im = imread("carell/trainning_set/" + carell[i-size/2])[:,:,0]
-        im = np.reshape(im, (1, 1024))
-        x = np.concatenate((x, im), 0)
-    
+def class_or_correct(size, set, flag): 
+    '''flag = 1 :classifiy
+       flag = 0 :correction
+    '''
 
-    x = np.concatenate((one, x), 1)
-    new_t = grad_descent(f, df, x, y, t, 5*1e-10)
-    return new_t
-    
-def correction(size, set):    
     x = np.empty(shape=[0, 1024])
     y = np.array([[1 for v in range(size/2)]])
     y1 = np.array([[0 for p in range(size/2)]])
@@ -192,25 +196,28 @@ def correction(size, set):
         x = np.concatenate((x, im), 0)
 
     x = np.concatenate((one, x), 1)
-    correction = 0
-    expect = np.dot(x, new_t)
-    
-    for i in range(size):
-        if i < size/2:
-            if expect[i] >= 0.5:
-                correction += 1
-        else: 
-            if expect[i] < 0.5:
-                correction += 1
-    print"cost: %.3f\n" %(f(x, y, new_t))
-    print"Percentage: %.3f\n" % (correction/float(size))
+    if flag:
+        t = np.zeros([1025, 1])  
+        return grad_descent(f, df, x, y, t, 5*1e-10)
+    else:
+        correction = 0
+        expect = np.dot(x, new_t)
+        
+        for i in range(size):
+            if i < size/2:
+                if expect[i] >= 0.5:
+                    correction += 1
+            else: 
+                if expect[i] < 0.5:
+                    correction += 1
+        print"cost: %.3f\n" %(f(x, y, new_t))
+        print"Percentage: %.3f\n" % (correction/float(size))
     
 def part3(size):
-    t = np.zeros([1025, 1])
     global new_t
-    new_t = classifier(size,  t)
-    correction(200, "trainning_set/")
-    correction(10, "validation_set/")
+    new_t = class_or_correct(size, "trainning_set/", 1)
+    class_or_correct(200, "trainning_set/", 0)
+    class_or_correct(10, "validation_set/", 0)
     
 
 def part4():
@@ -225,19 +232,57 @@ def part4():
     
 part4()
 
+act =['Fran Drescher', 'America Ferrera', 'Kristin Chenoweth', 'Alec Baldwin', 'Bill Hader', 'Steve Carell']
+act_test = ['Gerard Butler', 'Daniel Radcliffe', 'Michael Vartan', 'Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon']
+new_t2
 
-def part5():
-    for i in range(size):
-        if (i < size/2):
-            im = imread("hader/trainning_set/" + hader[i])[:,:,0]
-        else :
-            im = imread("carell/trainning_set/" + carell[i-size/2])[:,:,0]
-        im = np.reshape(im, (1, 1024))
-        x = np.concatenate((x, im), 0)
-    x = np.concatenate((one, x), 1)
-    global new_t
-    new_t = grad_descent(f, df, x, y, t, 5*1e-10)
+def class_and_correct(act, size, set):
+    '''flag = 1 :classifiy
+       flag = 0 :correction
+    '''
+    t = np.zeros([1025, 1])
+    x = np.empty(shape=[0, 1024])
+    y = np.array([[1 for v in range(size*3)]])
+    y1 = np.array([[0 for p in range(size*3)]])
+    y = np.concatenate((y, y1), 1)
+    y = np.reshape(y, (size*6,1))
+    one = np.array([[1 for q in range(size*6)]])
+    one = np.reshape(one, (size*6,1))
     
+    for a in act:
+        name = a.split(" ")[1].lower()
+        dir = os.listdir(name + set)
+        for i in range(size):
+            im = imread(name + set + dir[i])[:,:,0]
+            im = np.reshape(im, (1, 1024))
+            x = np.concatenate((x, im), 0)
+    x = np.concatenate((one, x), 1)
+    t = np.zeros([1025, 1]) 
+    new_t2 =  grad_descent(f, df, x, y, t, 5*1e-10)
+    correction = 0
+    expect = np.dot(x, new_t)
+        
+    for i in range(size):
+        if i < size/2:
+            if expect[i] >= 0.5:
+                correction += 1
+        else: 
+            if expect[i] < 0.5:
+                correction += 1
+    print new_t2
+    print"cost: %.3f\n" %(f(x, y, new_t))
+    print"Percentage: %.3f\n" % (correction/float(size))
+    
+def part5():
+    class_and_correct(act, 100, "/trainning_set/")
+    class_and_correct(act, 100, "/trainning_set/")
+    class_and_correct(200, "/trainning_set/", 1)
+    class_and_correct(10, "/validation_set/", 1)
+
+    
+    # print new_t
+    
+# part5()
     
     
     
