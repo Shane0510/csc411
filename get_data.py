@@ -230,13 +230,13 @@ def part4():
     # imshow(image2)
     imsave("small.jpg", image2, cmap = cm.coolwarm)
     
-part4()
+# part4()
 
 act =['Fran Drescher', 'America Ferrera', 'Kristin Chenoweth', 'Alec Baldwin', 'Bill Hader', 'Steve Carell']
-act_test = ['Gerard Butler', 'Daniel Radcliffe', 'Michael Vartan', 'Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon']
-new_t2
+act_test = ['Lorraine Bracco', 'Peri Gilpin', 'Angie Harmon', 'Gerard Butler', 'Daniel Radcliffe', 'Michael Vartan']
 
-def class_and_correct(act, size, set):
+
+def class_or_correct2(act, size, set, flag, new_t2):
     '''flag = 1 :classifiy
        flag = 0 :correction
     '''
@@ -257,32 +257,43 @@ def class_and_correct(act, size, set):
             im = np.reshape(im, (1, 1024))
             x = np.concatenate((x, im), 0)
     x = np.concatenate((one, x), 1)
-    t = np.zeros([1025, 1]) 
-    new_t2 =  grad_descent(f, df, x, y, t, 5*1e-10)
+    if flag:
+        t = np.zeros([1025, 1]) 
+        theta = grad_descent(f, df, x, y, t, 5*1e-10)
+    else:
+        theta = new_t2
     correction = 0
-    expect = np.dot(x, new_t)
+    expect = np.dot(x, theta)
         
     for i in range(size):
-        if i < size/2:
+        if i < size*3:
             if expect[i] >= 0.5:
                 correction += 1
         else: 
             if expect[i] < 0.5:
                 correction += 1
-    print new_t2
-    print"cost: %.3f\n" %(f(x, y, new_t))
-    print"Percentage: %.3f\n" % (correction/float(size))
+
+    print "Act: " 
+    print act
+    print "Set: " 
+    print set
+    print"cost: %.3f\n" %(f(x, y, theta))
+    print"Percentage: %.3f\n" % (correction/float(size*6))
+    return theta
     
 def part5():
-    class_and_correct(act, 100, "/trainning_set/")
-    class_and_correct(act, 100, "/trainning_set/")
-    class_and_correct(200, "/trainning_set/", 1)
-    class_and_correct(10, "/validation_set/", 1)
+    new_t2 = class_or_correct2(act, 100, "/trainning_set/", 1, 0)
+    print new_t2
+    new_t2 = class_or_correct2(act, 10, "/validation_set/", 1, 0)
+    print new_t2
+    new_t2 = class_or_correct2(act, 100, "/trainning_set/", 1, 0)
+    print new_t2
+    class_or_correct2(act_test, 100, "/trainning_set/", 0, new_t2)
 
     
     # print new_t
     
-# part5()
+part5()
     
     
     
