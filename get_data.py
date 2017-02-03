@@ -16,10 +16,9 @@ from PIL import Image
 import shutil
 from shutil import copy
 
-act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
 
-#def crop(image_array):
-#    imresize(image_array)
+
+
 
 def rgb2gray(rgb):
     '''Return the grayscale version of the RGB image rgb as a 2D numpy array
@@ -63,11 +62,11 @@ testfile = urllib.URLopener()
 #Note: you need to create the uncropped folder first in order
 #for this to work
 
-def part1():
+def part1(file):
     for a in act:
         name = a.split()[1].lower()
         i = 0
-        for line in open("facescrub_actors.txt"):
+        for line in open(file):
             if a in line:
                 filename = name+str(i)+'.'+line.split()[4].split('.')[-1]
                 #A version without timeout (uncomment in case you need to
@@ -216,7 +215,7 @@ def class_or_correct(size, set, flag):
 def part3(size):
     global new_t
     new_t = class_or_correct(size, "trainning_set/", 1)
-    class_or_correct(200, "trainning_set/", 0)
+    class_or_correct(size, "trainning_set/", 0)
     class_or_correct(10, "validation_set/", 0)
     
 
@@ -281,22 +280,25 @@ def class_or_correct2(act, size, set, flag, new_t2):
     print"Percentage: %.3f\n" % (correction/float(size*6))
     return theta
     
-def part5():
-    new_t2 = class_or_correct2(act, 100, "/trainning_set/", 1, 0)
+def part5(size):
+    new_t2 = class_or_correct2(act, size, "/trainning_set/", 1, 0)
     print new_t2
-    new_t2 = class_or_correct2(act, 10, "/validation_set/", 1, 0)
-    print new_t2
-    new_t2 = class_or_correct2(act, 100, "/trainning_set/", 1, 0)
-    print new_t2
-    class_or_correct2(act_test, 100, "/trainning_set/", 0, new_t2)
+    class_or_correct2(act, 10, "/validation_set/", 0, new_t2)
+    class_or_correct2(act_test, 10, "/test_set/", 0, new_t2)
 
     
     # print new_t
-    
-# part5()
+
+# part5(100)
+
+#part6
 def cost(x, y, theta):
     #x = vstack( (ones((1, x.shape[1])), x))
-    return 0.0025*sum( (y - np.dot(x, theta)) ** 2)
+    return sum( (np.dot(theta.T,x) - y) ** 2)
+ 
+def derive(x, y, theta):
+    #x = vstack( (ones((1, x.shape[1])), x))
+    return 2 * np.dot(x, (np.dot(theta.T, x) - y).T)
     
 def vectorized_grad_descent(f, df, x, y, init_t, alpha):
     t = init_t.copy()
@@ -310,14 +312,91 @@ def vectorized_grad_descent(f, df, x, y, init_t, alpha):
         #     print "Gradient: ", df(x, y, t), "\n"
         iter += 1
     return t
+
+
+def class_or_correct3(act, size, set, flag, new_t3):
+    '''flag = 1 :classifiy
+       flag = 0 :correction
+    '''
+    labels = np.array([[1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 0, 0], [0, 0, 0, 0, 1, 0], [0, 0, 0, 0, 0, 1]])
+    t = np.zeros([1025, 6])
+    x = np.empty(shape=[0, 1024])
+    y = np.empty(shape=[6, 0])
+    for i in range(6):
+        y1 = labels[i,:]
+        y1 = np.reshape(y1, [6, 1])
+        for p in range(size):
+            y = np.concatenate((y, y1), 1)
+    one = np.array([[1 for q in range(size*6)]])
+    one = np.reshape(one, (size*6,1))
+    
+    for a in act:
+        name = a.split(" ")[1].lower()
+        print name
+        dir = os.listdir(name + set)
+        for i in range(size):
+            im = imread(name + set + dir[i])[:,:,0]
+            im = np.reshape(im, (1, 1024))
+            x = np.concatenate((x, im), 0)
+    x = np.concatenate((one, x), 1)
+    x = x.T
+    if flag:
+        theta = vectorized_grad_descent(cost, derive, x, y, t, 5*1e-11)
+    else:
+        theta = new_t3
+    correction = 0
+    expect = np.dot(theta.T, x)
         
-def part6():
+    for i in range(size*6):
+        if i < size:
+            if argmax(expect[:,i], axis = 0) == 0:
+                correction += 1
+        elif i < size*2:
+            if argmax(expect[:,i], axis = 0) == 1:
+                correction += 1
+        elif i < size*3:
+            if argmax(expect[:,i], axis = 0) == 2:
+                correction += 1
+        elif i < size*4:
+            if argmax(expect[:,i], axis = 0) == 3:
+                correction += 1
+        elif i < size*5:
+            if argmax(expect[:,i], axis = 0) == 4:
+                correction += 1
+        elif i < size*6:
+            if argmax(expect[:,i], axis = 0) == 5:
+                correction += 1
+
+    print "Act: " 
+    print act
+    print "Set: " 
+    print set
+    print"cost: %.3f\n" %(cost(x, y, theta))
+    print"Percentage: %.3f\n" % (correction/float(size*6))
+    return theta
     
-    
-    
-    
-    
-    
-    
+def part7(size):
+    global new_t3
+    new_t3 = class_or_correct3(act, size, "/trainning_set/", 1, 0)
+    class_or_correct3(act, 10, "/validation_set/", 0, new_t3)
+
+
+
+def part8(size):
+    part7(size)
+    theta = new_t3[1:,:]
+    for i in range(6):
+        x = theta[:,i]
+        print x.shape
+        image = np.reshape(x, (32, 32))
+        imsave("image" + str(i) + ".jpg", image, cmap = cm.coolwarm)
+
+part8(100)
+# os.mkdir("uncropped/")
+# os.mkdir("cropped/")
+# act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
+# part1("facescrub_actors.txt")
+# act = list(set([a.split("\t")[0] for a in open("facescrub_actresses.txt").readlines()]))
+# part1("facescrub_actresses.txt")
     
 
