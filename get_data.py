@@ -17,7 +17,9 @@ import shutil
 from shutil import copy
 
 
-
+def random_num(list):
+    random.seed(0)
+    random.shuffle(list)
 
 
 def rgb2gray(rgb):
@@ -89,6 +91,8 @@ def part1(file):
                 i += 1
     
 def part2():
+    dict = {}
+    # "baldwin":[], "bracco": [], "butler": [], "carell": [], "chenoweth": [], "drescher": [], "ferrera": [], "gilpin": [], "hader": [], "harmon": [], "radcliffe": [], "vartan": []
     trainning_set = 100
     test_set = 10
     validation_set = 10
@@ -99,29 +103,27 @@ def part2():
         f_name = image.split(".")[0]
         n_list = [v for v in f_name if v.isalpha()]
         name = f_name[0:len(n_list)]
+        if name in dict.keys():
+            dict[name].append(image)
+        else:
+            dict[name] = []
+            dict[name].append(image)
+    for ppl in dict.keys()
+        random_num(dict[ppl])
+        if not os.path.exists(ppl + "/"):
+            os.mkdir(ppl + "/")
+            os.mkdir(ppl + "/trainning_set/")
+            os.mkdir(ppl + "/test_set/")
+            os.mkdir(ppl + "/validation_set/")
         
-        if not os.path.exists(name + "/"):
-            os.mkdir(name + "/")
-            os.mkdir(name + "/trainning_set/")
-            os.mkdir(name + "/test_set/")
-            os.mkdir(name + "/validation_set/")
-        
-        try:
-            val = int(f_name.split(name)[1])
-        
+        for i in range(100):
+            copy("cropped/" + dict[ppl][i], ppl + "/trainning_set/" + str(i))
+        for i in range(10):
+            copy("cropped/" + dict[ppl][i + 100], ppl + "/test_set/" + str(i))
+        for i in range(len(dict[ppl]) - 110):
+            copy("cropped/" + image, ppl + "/validation_set/" + str(i))
         except:
             continue
-        
-        if val < trainning_set:
-            copy("cropped/" + image, name + "/trainning_set/" + image)
-            
-        elif trainning_set <= val < trainning_set + test_set:
-            copy("cropped/" + image, name + "/test_set/" + image)
-        
-        elif trainning_set + test_set <= val < trainning_set + test_set +\
-        validation_set:
-            copy("cropped/" + image, name + "/validation_set/" + image)
-                
   
   
 def f(x, y, theta):
@@ -312,8 +314,14 @@ def vectorized_grad_descent(f, df, x, y, init_t, alpha):
         #     print "Gradient: ", df(x, y, t), "\n"
         iter += 1
     return t
-
-
+# part7
+def part6(p, q):
+    h = 5*1e-11
+    x = np.ones(shape = [1, 6])
+    y = np.ones(shape = [1, 6])
+    theta = 
+    return 2 * np.dot(x, (np.dot(theta.T, x) - y).T)
+    
 def class_or_correct3(act, size, set, flag, new_t3):
     '''flag = 1 :classifiy
        flag = 0 :correction
@@ -391,12 +399,14 @@ def part8(size):
         image = np.reshape(x, (32, 32))
         imsave("image" + str(i) + ".jpg", image, cmap = cm.coolwarm)
 
-part8(100)
+
 # os.mkdir("uncropped/")
 # os.mkdir("cropped/")
 # act = list(set([a.split("\t")[0] for a in open("facescrub_actors.txt").readlines()]))
 # part1("facescrub_actors.txt")
 # act = list(set([a.split("\t")[0] for a in open("facescrub_actresses.txt").readlines()]))
 # part1("facescrub_actresses.txt")
-    
+# part2()
+# part3()
+# part8(100) 
 
