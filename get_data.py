@@ -251,6 +251,7 @@ def class_or_correct2(act, size, set, flag, new_t2):
     
     for a in act:
         name = a.split(" ")[1].lower()
+        print name
         dir = os.listdir(name + set)
         for i in range(size):
             im = imread(name + set + dir[i])[:,:,0]
@@ -258,14 +259,13 @@ def class_or_correct2(act, size, set, flag, new_t2):
             x = np.concatenate((x, im), 0)
     x = np.concatenate((one, x), 1)
     if flag:
-        t = np.zeros([1025, 1]) 
         theta = grad_descent(f, df, x, y, t, 5*1e-10)
     else:
         theta = new_t2
     correction = 0
     expect = np.dot(x, theta)
         
-    for i in range(size):
+    for i in range(size*6):
         if i < size*3:
             if expect[i] >= 0.5:
                 correction += 1
@@ -293,7 +293,26 @@ def part5():
     
     # print new_t
     
-part5()
+# part5()
+def cost(x, y, theta):
+    #x = vstack( (ones((1, x.shape[1])), x))
+    return 0.0025*sum( (y - np.dot(x, theta)) ** 2)
+    
+def vectorized_grad_descent(f, df, x, y, init_t, alpha):
+    t = init_t.copy()
+    max_iter = 30000
+    iter  = 0
+    while iter < max_iter:
+        t -= alpha*df(x, y, t)
+        # if iter % 500 == 0:
+        #     print "Iter", iter
+        #     print "x = (%.2f, %.2f, %.2f), f(x) = %.2f" % (t[0], t[1], t[2], f(x, y, t)) 
+        #     print "Gradient: ", df(x, y, t), "\n"
+        iter += 1
+    return t
+        
+def part6():
+    
     
     
     
