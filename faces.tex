@@ -381,10 +381,12 @@ act_test = ['Gerard Butler', 'Daniel Radcliffe', 'Michael Vartan', 'Lorraine Bra
 \end{lstlisting}
 
 \includegraphics[width=\linewidth]{Performance_Plot}
-Note: the $x-axis$'s label is wrong it should be the training example size.
+
 The blue line is the performance percentage of the classifier on the training set of the actors in $act$.  The yellow line is the performance percentage of the classifier on the validation set of the actors in $act$. The green line is the performance percentage of the classifier on the test set of the actors in $act\_test$.  With the classifier built by each iteration.\\
 
-The performance of the $act\_test$ is increasing as iteration increase except at the last point where it went down which is a result of overfitting.
+The performance of the test set accuracy is low when the number of training examples is small, meaning the system is overly complex which resulted in overfitting, but as the training set gets large the accuracy goes up.\\
+The performance/accuracy for the test set of actors in $act\_test$, the following accuracy array correspond to this training size array $[5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]$ \\
+accuracy array:$[0.717, 0.733, 0.733, 0.767, 0.767, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.817, 0.85, 0.867, 0.867, 0.883, 0.883, 0.883, 0.9, 0.85]$
 \end{ProjectPart}
 \clearpage
 

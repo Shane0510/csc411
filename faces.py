@@ -187,20 +187,22 @@ def class_or_correct(size, set, flag):
         print"Percentage: %.3f\n" % (correction/float(size))
     
 def part3(size):
+    print "Part3 Start"
     global new_t
     new_t = class_or_correct(size, "trainning_set/", 1)
     class_or_correct(size, "trainning_set/", 0)
     class_or_correct(10, "validation_set/", 0)
-    
+    print "Part3 Done"
 
 def part4():
+    print "Part4 Start"
     part3(200)
     image1 = np.reshape(new_t[1:], (32, 32))
     imsave("full.jpg", image1, cmap = cm.coolwarm)
     part3(4)
     image2 = np.reshape(new_t[1:], (32, 32))
     imsave("small.jpg", image2, cmap = cm.coolwarm)
-    
+    print "Part4 Done"
 # part4()
 
 act =['Fran Drescher', 'America Ferrera', 'Kristin Chenoweth', 'Alec Baldwin', 'Bill Hader', 'Steve Carell']
@@ -247,8 +249,8 @@ def class_or_correct2(act, size, set, flag, new_t2):
     # print act
     # print "Set: " 
     # print set
-    print"cost: %.3f\n" %(f(x, y, theta))
-    print"Percentage: %.3f\n" % (correction/float(size*6))
+    # print"cost: %.3f\n" %(f(x, y, theta))
+    # print"Percentage: %.3f\n" % (correction/float(size*6))
     return [theta, correction/float(size*6)]
     
 def plot(): 
@@ -264,16 +266,26 @@ def plot():
         p2.append(set[1])
         p3.append(set[2])
         i += 5
+    print "Plot"
+    print iter
+    # print "Training set"
+    # print p1
+    # print "Validation set"
+    # print p2
+    print "Test set"
+    print p3
     plt.plot(iter, p1)
     plt.plot(iter, p2)
     plt.plot(iter, p3)
     plt.show()
         
 def part5(size):
+    print "Part5 Start"
     result = class_or_correct2(act, size, "/trainning_set/", 1, 0)
     new_t2 = result[0]
     result2 = class_or_correct2(act, 10, "/validation_set/", 0, new_t2)
     result3 = class_or_correct2(act_test, 10, "/test_set/", 0, new_t2)
+    print "Part5 Done"
     return [result[1], result2[1], result3[1]]
 
 
@@ -303,6 +315,7 @@ def vectorized_grad_descent(f, df, x, y, init_t, alpha):
     return t
 
 def part6(p, q):
+    print "Part6 Start"
     h = 5*1e-11
     x = np.ones([1025, 600])
     y = np.ones([6, 600])
@@ -311,6 +324,7 @@ def part6(p, q):
     theta_h[p, q] += h 
     print (cost(x, y, theta_h) - cost(x, y, theta))/h
     print derive(x, y, theta)[p, q]
+    print "Part6 Done"
     
     
 # part7
@@ -374,21 +388,26 @@ def class_or_correct3(act, size, set, flag, new_t3):
     return theta
     
 def part7(size):
+    print "Part7 Start"
     global new_t3
     new_t3 = class_or_correct3(act, size, "/trainning_set/", 1, 0)
     class_or_correct3(act, 10, "/validation_set/", 0, new_t3)
-
+    print "Part7 Done"
 
 
 def part8(size):
+    print "Part8 Start"
     part7(size)
     theta = new_t3[1:,:]
     for i in range(6):
         x = theta[:,i]
         image = np.reshape(x, (32, 32))
         imsave("image" + str(i) + ".jpg", image, cmap = cm.coolwarm)
-
-
+    print "Part8 Done"
+    
+    
+    
+    
 if not os.path.exists("uncropped/"):
     os.mkdir("uncropped/")
 if not os.path.exists("cropped/"):
@@ -403,6 +422,5 @@ plot()
 part6(3,5)
 part6(6,1)
 part6(16,4)
-part7(100)
 part8(100) 
 
